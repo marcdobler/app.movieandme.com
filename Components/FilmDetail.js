@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import { StyleSheet, View, Text, ActivityIndicator, Image, FlatList } from 'react-native'
+import { StyleSheet, View, Text, ActivityIndicator, Image, Button, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import moment from 'moment'
 import numeral from 'numeral'
@@ -28,9 +28,26 @@ class FilmDetail extends Component {
         })
     }
 
-    _displaySeparator() {
+    _toggleFavorite() {
+        const action = { type: 'TOGGLE_FAVORITE', value: this.state.film }
+        this.props.dispatch(action)
+    }
+
+    componentDidUpdate() {
+        console.log(this.props.favoritesFilm.id)
+    }
+
+    _displayFavoriteImage() {
+        var sourceImage = require('../Images/ic_favorite_border.png')
+        if (this.props.favoritesFilm.findIndex(item => item.id === this.state.film.id) !== -1) {
+          // Film dans nos favoris
+          sourceImage = require('../Images/ic_favorite.png')
+        }
         return (
-            <Text style={styles.meta}>/</Text>
+          <Image
+            style={styles.favorite_image}
+            source={sourceImage}
+          />
         )
     }
 
@@ -49,6 +66,11 @@ class FilmDetail extends Component {
                         source={{ uri: getImageFromApi(film.backdrop_path) }}
                     />
                     <Text style={styles.title_text}>{film.title}</Text>
+                    <TouchableOpacity
+                        style={styles.favorite_container}
+                        onPress={() => this._toggleFavorite()} >
+                            {this._displayFavoriteImage()}
+                    </TouchableOpacity>
                     <Text style={styles.description_text}>{film.overview}</Text>
                     <Text style={styles.default_text}>Sorti le {moment(new Date(film.release_date)).format('DD/MM/YYYY')}</Text>
                     <Text style={styles.default_text}>Note : {film.vote_average} / 10</Text>
@@ -78,7 +100,6 @@ class FilmDetail extends Component {
     }
 
     render() {
-        console.log(this.props)
         return (
             <View style={styles.main_container}>
                 {this._displayFilm()}
@@ -130,6 +151,13 @@ const styles = StyleSheet.create({
         marginLeft: 5,
         marginRight: 5,
         marginTop: 5,
+    },
+    favorite_container: {
+        alignItems: 'center'
+    },
+    favorite_image: {
+        width: 40,
+        height: 40
     }
 })
 

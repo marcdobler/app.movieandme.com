@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { StyleSheet, View, TextInput, Button, Text, FlatList, ActivityIndicator } from 'react-native'
 import FilmItem from './FilmItem'
 import { getFilmsFromApiWithSearchedText } from '../API/TMDBApi'
+import { connect } from 'react-redux'
 
 class Search extends Component {
 
@@ -55,7 +56,6 @@ class Search extends Component {
     }
 
     _displayDetailFromFilm = (idFilm) => {
-        console.log('Display film with id ' + idFilm)
         this.props.navigation.navigate("FilmDetail", { idFilm: idFilm })
     }
 
@@ -74,8 +74,14 @@ class Search extends Component {
                 />
                 <FlatList
                     data={this.state.films}
+                    extraData={this.props.favoritesFilm}
                     keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => <FilmItem film={item} displayDetailForFilm={this._displayDetailFromFilm} />}
+                    renderItem={({ item }) =>
+                        <FilmItem
+                            film={item}
+                            displayDetailForFilm={this._displayDetailFromFilm}
+                            isFilmFavorite={(this.props.favoritesFilm.findIndex(film => film.id === item.id) !== -1) ? true : false}
+                        />}
                     onEndReachedThreshold={0.5}
                     onEndReached={() => {
                         if (this.page < this.totalPages) { // On vérifie qu'on n'a pas atteint la fin de la pagination (totalPages) avant de charger plus d'éléments
@@ -113,4 +119,10 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Search
+const mapStateToProps = (state) => {
+    return {
+        favoritesFilm: state.favoritesFilm
+    }
+}
+
+export default connect(mapStateToProps)(Search)
