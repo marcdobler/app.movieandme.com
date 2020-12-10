@@ -4,6 +4,7 @@ import { StyleSheet, View, Text, ActivityIndicator, Image, FlatList } from 'reac
 import { ScrollView } from 'react-native-gesture-handler'
 import moment from 'moment'
 import numeral from 'numeral'
+import { connect } from 'react-redux'
 
 import { getFilmDetailFromApi } from '../API/TMDBApi'
 import { getImageFromApi } from '../API/TMDBApi'
@@ -77,6 +78,7 @@ class FilmDetail extends Component {
     }
 
     render() {
+        console.log(this.props)
         return (
             <View style={styles.main_container}>
                 {this._displayFilm()}
@@ -131,4 +133,10 @@ const styles = StyleSheet.create({
     }
 })
 
-export default FilmDetail
+const mapStateToProps = (state) => {
+    return {
+        favoritesFilm: state.favoritesFilm
+    }
+}
+
+export default connect(mapStateToProps)(FilmDetail)
